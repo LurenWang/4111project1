@@ -1,6 +1,5 @@
 stmt1 = """CREATE TABLE IF NOT EXISTS Users (
-    uid INTEGER PRIMARY KEY,
-    username STRING UNIQUE,
+    username STRING PRIMARY KEY,
     name STRING,
     password STRING,
     contact_info STRING,
@@ -8,22 +7,22 @@ stmt1 = """CREATE TABLE IF NOT EXISTS Users (
 );"""
 
 stmt2 = """CREATE TABLE IF NOT EXISTS Sessions (
-    uid INT,
+    username STRING,
     sid INTEGER PRIMARY KEY,
-    start_time DATE NOT NULL,
+    title STRING NOT NULL,
+    start_time STRING NOT NULL,
     session_length INT NOT NULL,
     location TEXT NOT NULL,
-    type TEXT CHECK (type IN ('study group', 'tutor', 'events')),
     description TEXT,
-    FOREIGN KEY(uid) REFERENCES Users
+    FOREIGN KEY(username) REFERENCES Users
 );"""
 
 stmt3 = """CREATE TABLE IF NOT EXISTS Attends (
-    uid INT,
+    username STRING,
     sid INT,
     role TEXT CHECK (role IN ('attendee', 'admin')),
-    PRIMARY KEY(uid, sid),
-    FOREIGN KEY(uid) REFERENCES Users ON DELETE CASCADE,
+    PRIMARY KEY(username, sid),
+    FOREIGN KEY(username) REFERENCES Users ON DELETE CASCADE,
     FOREIGN KEY(sid) REFERENCES Sessions on DELETE CASCADE
 );"""
 
@@ -36,10 +35,10 @@ stmt4 = """CREATE TABLE IF NOT EXISTS Tags (
 
 stmt5 = """CREATE TABLE IF NOT EXISTS Posts (
     pid INTEGER PRIMARY KEY,
-    uid INT,
+    username STRING,
     sid INT,
     posted_text TEXT NOT NULL,
-    FOREIGN KEY(uid) REFERENCES Users ON DELETE CASCADE,
+    FOREIGN KEY(username) REFERENCES Users ON DELETE CASCADE,
     FOREIGN KEY(sid) REFERENCES Sessions ON DELETE CASCADE
 );"""
 
@@ -53,10 +52,10 @@ stmt6 = """CREATE TABLE IF NOT EXISTS Posted_Pictures (
 
 stmt7 = """CREATE TABLE IF NOT EXISTS Comments (
     pid INT,
-    uid INT,
+    username STRING,
     time DATE,
     posted_text TEXT NOT NULL,
-    PRIMARY KEY(pid, uid, time),
+    PRIMARY KEY(pid, username, time),
     FOREIGN KEY(pid) REFERENCES Posts ON DELETE CASCADE
 );"""
 

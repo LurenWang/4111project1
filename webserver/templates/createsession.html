@@ -6,8 +6,9 @@
     }
   </style>
 
+
 <body>
-    <h1>GroupIt Create Account</h1>
+    <h1>GroupIt Create Session</h1>
     {% with messages = get_flashed_messages() %}
         {% if messages %}
         <ul class=flashes>
@@ -19,25 +20,24 @@
     <form action="" method="post" name="login">
         {{ form.hidden_tag() }}
         <p>
-        Username:<br>
-        {{ form.username(size=80) }}<br>
+        Title:<br>
+        {{ form.title(size=80) }}<br>
         </p>
         <p>
-        Name:<br>
-        {{ form.name(size=80) }}<br>
+        Time:<br>
+        {{ form.start_time(size=80) }}<br>
         </p>
         <p>
-        Password:<br>
-        {{ form.password(size=80) }}<br>
+        Length:<br>
+        {{ form.length(size=80) }}<br>
         </p>
         <p>
-        Contact Information:<br>
-        {{ form.contact_info(size=80) }}<br>
+        Location:<br>
+        {{ form.location(size=80) }}<br>
         </p>
-        <p>
         Description:<br>
-        {{ form.description(size=160) }}<br>
+        {{ form.description(size=180) }}<br>
         </p>
-        <p><input type="submit" value="Create Account"></p>
+        <p><input type="submit" value="Create Session"></p>
     </form></body>
 </html>

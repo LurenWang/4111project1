@@ -24,7 +24,7 @@ from flask import Flask, request, render_template, g, redirect, Response, url_fo
         flash
 import pdb
 from tables import *
-from forms import LoginForm, CreateAccountForm
+from forms import *
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
@@ -160,12 +160,12 @@ def create_account():
         result = s.execute(q, {'u':form.username.data})
         rows = result.fetchall()
         if len(rows) == 0:
-            q1 = "INSERT INTO USERS VALUES (NULL, :a, :b, :c, :d, :e)"
+            q1 = "INSERT INTO USERS VALUES (:a, :b, :c, :d, :e)"
             s.execute(q1, {'a':form.username.data, 'b':form.name.data,
                 'c':form.password.data, 'd':form.contact_info.data, 
                 'e':form.description.data})
             s.commit()
-            return redirect(url_for('another'))
+            return redirect(url_for('home', username=form.username.data))
         else:
             flash('Username already taken')
     return render_template('createaccount.html', form=form)
@@ -177,7 +177,6 @@ def login():
         s = Session()
         q = "SELECT PASSWORD FROM USERS U WHERE U.USERNAME = :u"
         result = s.execute(q, {'u':form.username.data})
-        #pdb.set_trace()
         rows = result.fetchall()
         if len(rows) == 0:
             flash('Account not found')
@@ -185,13 +184,27 @@ def login():
         password = rows[0]
         if password[0] == form.password.data:
             flash('Logged in')
-            return redirect(url_for('another'))
+            return redirect(url_for('home', username=form.username.data))
         else:
             flash('Incorrect password')
             return render_template('login.html', form=form)
     return render_template('login.html', form=form)
 
+@app.route('/home/<username>')
+def home(username):
+    return render_template('homepage.html', username=username)
 
+@app.route('/createsession/<username>', methods=['GET', 'POST'])
+def create_session(username):
+    form = CreateSessionForm()
+    if form.validate_on_submit():
+        s = Session()
+        q = "insert into sessions values (:u, NULL, :a, :b, :c, :d, :e)"
+        s.execute(q, {'u':username, 'a':form.title.data, 'b':form.start_time.data, 
+            'c':form.length.data, 'd':form.location.data, 'e':form.description.data})
+        s.commit()
+        return redirect(url_for('home', username=username))
+    return render_template('createsession.html', form=form)
 
 if __name__ == "__main__":
   import click
