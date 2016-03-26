@@ -1,0 +1,20 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+DATABASEURI	server.py	/^DATABASEURI = "sqlite:\/\/\/test.db"$/;"	v
+add	server.py	/^def add():$/;"	f
+another	server.py	/^def another():$/;"	f
+app	server.py	/^app = Flask(__name__, template_folder=tmpl_dir)$/;"	v
+before_request	server.py	/^def before_request():$/;"	f
+create_lst	tables/tables.py	/^create_lst = []$/;"	v
+del_lst	tables/tables.py	/^del_lst = []$/;"	v
+engine	server.py	/^engine = create_engine(DATABASEURI)$/;"	v
+index	server.py	/^def index():$/;"	f
+login	server.py	/^def login():$/;"	f
+login_manager	server.py	/^login_manager = LoginManager()$/;"	v
+run	server.py	/^  def run(debug, threaded, host, port):$/;"	f	function:login
+teardown_request	server.py	/^def teardown_request(exception):$/;"	f
+tmpl_dir	server.py	/^tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')$/;"	v

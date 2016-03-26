@@ -1,0 +1,9 @@
+setup.py
+groupit.egg-info/PKG-INFO
+groupit.egg-info/SOURCES.txt
+groupit.egg-info/dependency_links.txt
+groupit.egg-info/not-zip-safe
+groupit.egg-info/top_level.txt
+webserver/server.py
+webserver/tables/__init__.py
+webserver/tables/tables.py
