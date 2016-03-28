@@ -9,14 +9,14 @@
 
 <body>
     <h1>GroupIt Sign In</h1>
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        <ul class=flashes>
-            {% for messages in messages %}
-                <li>{{ messages }}</li>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
+    <!--{% with messages = get_flashed_messages() %}-->
+        <!--{% if messages %}-->
+        <!--<ul class=flashes>-->
+            <!--{% for messages in messages %}-->
+                <!--<li>{{ messages }}</li>-->
+            <!--{% endfor %}-->
+        <!--{% endif %}-->
+    <!--{% endwith %}-->
     <form action="" method="post" name="login">
         {{ form.hidden_tag() }}
         <p>

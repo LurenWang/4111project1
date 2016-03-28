@@ -1,5 +1,5 @@
 from flask.ext.wtf import Form
-from wtforms import StringField, IntegerField, validators
+from wtforms import StringField, TextField, IntegerField, validators
 from wtforms.validators import DataRequired
 
 class CreateAccountForm(Form):
@@ -17,6 +17,12 @@ class CreateSessionForm(Form):
     title = StringField('Title', validators=[DataRequired()])
     start_time = StringField('Time', validators=[DataRequired()])
     length = IntegerField('Length', validators=[DataRequired(), 
-        validators.NumberRange(min=0,max=999)])
+        validators.NumberRange(min=0, max=999)])
     location = StringField('Location', validators=[DataRequired()])
     description = StringField('Description')
+
+class PostForm(Form):
+    post = TextField('Post', validators=[DataRequired()])
+
+class CommentForm(Form):
+    comment = TextField('Comment', validators=[DataRequired()])

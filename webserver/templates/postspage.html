@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+#header {
+    background-color:black;
+    color:white;
+    text-align:center;
+    padding:5px;
+}
+#nav {
+    line-height:30px;
+    background-color:#eeeeee;
+    height:300px;
+    width:200px;
+    float:left;
+    padding:5px;	      
+}
+#comments_section {
+    width:500px;
+    float:left;
+    padding:10px;	 	 
+}
+#description_section {
+    line-height:30px;
+    background-color:#eeeeee;
+    height:300px;
+    width:200px;
+    float:right;
+    padding:5px;	      
+}
+#footer {
+    background-color:black;
+    color:white;
+    clear:both;
+    text-align:center;
+   padding:5px;	 	 
+}
+</style>
+</head>
+<body>
+
+<div id="header">
+    <h1>{{ session[2] }}</h1>
+</div>
+
+<div id="nav">
+<a href={{ url_for('sessionpage', sid=sid, username=username) }}>Go Back</a><br>
+</div>
+
+<div id="comments_section">
+    <h2>Comments</h2>
+    <ul class=comments>
+        {% if comments %}
+            {% for c in comments %}
+                <li>
+                    <div id=comments_list>
+                        <h3>{{ c[0] }}</h3>
+                        <p>{{ c[1] }}</p>
+                    </div>
+                </li>
+            {% endfor %}
+        {% endif %}
+        <form action="" method="post" name="comment">
+            {{ commentform.hidden_tag() }}
+            <p>
+            Comment:<br>
+            {{ commentform.comment(size=160) }}<br>
+            </p>
+            <p><input type="submit" value="Comment"></p>
+        </form>
+</div>
+
+<div id="footer">
+    By GroupitDev
+</div>
+
+</body>
+</html>

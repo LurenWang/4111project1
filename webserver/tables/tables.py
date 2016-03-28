@@ -36,6 +36,7 @@ stmt4 = """CREATE TABLE IF NOT EXISTS Tags (
 stmt5 = """CREATE TABLE IF NOT EXISTS Posts (
     pid INTEGER PRIMARY KEY,
     username STRING,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
     sid INT,
     posted_text TEXT NOT NULL,
     FOREIGN KEY(username) REFERENCES Users ON DELETE CASCADE,
@@ -53,9 +54,9 @@ stmt6 = """CREATE TABLE IF NOT EXISTS Posted_Pictures (
 stmt7 = """CREATE TABLE IF NOT EXISTS Comments (
     pid INT,
     username STRING,
-    time DATE,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
     posted_text TEXT NOT NULL,
-    PRIMARY KEY(pid, username, time),
+    PRIMARY KEY(pid, username, timestamp),
     FOREIGN KEY(pid) REFERENCES Posts ON DELETE CASCADE
 );"""
 

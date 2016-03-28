@@ -45,43 +45,15 @@ app = Flask(__name__, template_folder=tmpl_dir)
 #
 DATABASEURI = "sqlite:///test.db"
 
-
-#
-# This line creates a database engine that knows how to connect to the URI above
-#
 engine = create_engine(DATABASEURI)
 Session = None
 
 
-#
-# START SQLITE SETUP CODE
-#
-# after these statements run, you should see a file test.db in your webserver/ directory
-# this is a sqlite database that you can query like psql typing in the shell command line:
-# 
-#     sqlite3 test.db
-#
-# The following sqlite3 commands may be useful:
-# 
-#     .tables               -- will list the tables in the database
-#     .schema <tablename>   -- print CREATE TABLE statement for table
-# 
-# The setup code should be deleted once you switch to using the Part 2 postgresql database
-#
-#engine.execute("""DROP TABLE IF EXISTS test;""")
-#engine.execute("""CREATE TABLE IF NOT EXISTS test (
-  #id serial,
-  #name text
-#);""")
-#engine.execute("""INSERT INTO test(name) VALUES ('grace hopper'), ('alan turing'), ('ada lovelace');""")
 for stmt in del_lst:
     engine.execute(stmt)
 
 for stmt in create_lst:
     engine.execute(stmt)
-#
-# END SQLITE SETUP CODE
-#
 
 @app.before_request
 def before_request():
@@ -130,27 +102,6 @@ def teardown_request(exception):
 def index():
     return render_template('index.html')
 
-#
-# This is an example of a different path.  You can see it at
-# 
-#     localhost:8111/another
-#
-# notice that the functio name is another() rather than index()
-# the functions for each app.route needs to have different names
-#
-@app.route('/another')
-def another():
-  return render_template("anotherfile.html")
-
-
-# Example of adding new data to the database
-#@app.route('/add', methods=['POST'])
-#def add():
-  #name = request.form['name']
-  #g.conn.execute('INSERT INTO test VALUES (NULL, ?)', name)
-  #return redirect('/')
-
-
 @app.route('/create_account', methods = ['GET', 'POST'])
 def create_account():
     form = CreateAccountForm()
@@ -192,14 +143,59 @@ def login():
 
 @app.route('/home/<username>')
 def home(username):
-    return render_template('homepage.html', username=username)
+    q = "select title, start_time, location, sid from sessions;"
+    s = Session()
+    result = s.execute(q)
+    rows = result.fetchall()
+    return render_template('homepage.html', username=username, sessions=rows)
+
+@app.route('/session/<sid>', methods=['GET', 'POST'])
+def sessionpage(sid):
+    postform = PostForm()
+    q = "select * from sessions s where s.sid = :s;"
+    s = Session()
+    result = s.execute(q, {'s':sid})
+    rows = result.fetchall()
+    username = request.args['username']
+    if len(rows) == 0:
+        return redirect(url_for('home', username=username))
+    if postform.validate_on_submit():
+        q1 = "insert into posts values (NULL, :a, NULL, :b, :c);"
+        s.execute(q1, {'a':username, 'b':rows[0][1], 'c':postform.post.data})
+        s.commit()
+    q2 = "select username, posted_text, pid from posts order by timestamp;"
+    result = s.execute(q2)
+    posts = result.fetchall()
+    return render_template('sessionspage.html', session=rows[0], posts=posts,
+                username=username, postform=postform, sid=sid)
+
+@app.route('/post/<pid>', methods=['GET', 'POST'])
+def postspage(pid):
+    commentform = CommentForm()
+    q = "select * from posts p where p.pid = :p;"
+    s = Session()
+    result = s.execute(q, {'p':pid})
+    rows = result.fetchall()
+    username = request.args['username']
+    sid = request.args['sid']
+    if len(rows) == 0:
+        return redirect(url_for('sessionpage', sid=sid))
+    if commentform.validate_on_submit():
+        q1 = "insert into comments values (:a, :b, NULL, :c);"
+        s.execute(q1, {'a':pid, 'b':username, 'c':commentform.comment.data})
+        s.commit()
+    q2 = "select username, posted_text from comments order by timestamp;"
+    result = s.execute(q2)
+    comments = result.fetchall()
+    return render_template('postspage.html', comments=comments, username=username,
+            commentform=commentform, sid=sid)
 
 @app.route('/createsession/<username>', methods=['GET', 'POST'])
 def create_session(username):
     form = CreateSessionForm()
     if form.validate_on_submit():
         s = Session()
-        q = "insert into sessions values (:u, NULL, :a, :b, :c, :d, :e)"
+        q = "insert into sessions values (:u, NULL, :a, :b, :c, :d, :e);"
         s.execute(q, {'u':username, 'a':form.title.data, 'b':form.start_time.data, 
             'c':form.length.data, 'd':form.location.data, 'e':form.description.data})
         s.commit()

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+#header {
+    background-color:black;
+    color:white;
+    text-align:center;
+    padding:5px;
+}
+#nav {
+    line-height:30px;
+    background-color:#eeeeee;
+    height:300px;
+    width:200px;
+    float:left;
+    padding:5px;	      
+}
+#posts_section {
+    width:500px;
+    float:left;
+    padding:10px;	 	 
+}
+#description_section {
+    line-height:30px;
+    background-color:#eeeeee;
+    height:300px;
+    width:200px;
+    float:right;
+    padding:5px;	      
+}
+#footer {
+    background-color:black;
+    color:white;
+    clear:both;
+    text-align:center;
+   padding:5px;	 	 
+}
+</style>
+</head>
+<body>
+
+<div id="header">
+    <h1>{{ session[2] }}</h1>
+</div>
+
+<div id="nav">
+<a href={{"/home/%s" % username }}>Go Back</a><br>
+</div>
+
+<div id="posts_section">
+    <h2>User Posts</h2>
+    <ul class=posts>
+        {% if posts %}
+            {% for p in posts %}
+                <li>
+                    <div id=posts_list>
+                        <h3>{{ p[0] }}</h3>
+                        <p>{{ p[1] }}</p>
+                    </div>
+                </li>
+                <a href={{ url_for('postspage', pid=p[2], username=username, sid=sid )}}>Comment</a>
+            {% endfor %}
+        {% endif %}
+        <form action="" method="post" name="post">
+            {{ postform.hidden_tag() }}
+            <p>
+            Post:<br>
+            {{ postform.post(size=160) }}<br>
+            </p>
+            <p><input type="submit" value="Post"></p>
+        </form>
+</div>
+
+<div id="footer">
+    By GroupitDev
+</div>
+
+</body>
+</html>

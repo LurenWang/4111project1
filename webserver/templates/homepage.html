@@ -12,12 +12,12 @@
     line-height:30px;
     background-color:#eeeeee;
     height:300px;
-    width:100px;
+    width:200px;
     float:left;
     padding:5px;	      
 }
-#section {
-    width:350px;
+#sessions_section {
+    width:500px;
     float:left;
     padding:10px;	 	 
 }
@@ -40,12 +40,22 @@
 <a href={{"/createsession/%s" % username }}>+Session</a><br>
 </div>
 
-<div id="section">
-<h2>London</h2>
-<p>London is the capital city of England. It is the most populous city in the United Kingdom,
-with a metropolitan area of over 13 million inhabitants.</p>
-<p>Standing on the River Thames, London has been a major settlement for two millennia,
-its history going back to its founding by the Romans, who named it Londinium.</p>
+<div id="sessions_section">
+    <h2>Active Sessions</h2>
+    <ul class=sessions>
+        {% if sessions %}
+            {% for s in sessions %}
+                <li>
+                    <div id=sessions_list>
+                        <h3><a href={{ url_for('sessionpage', sid=s[3], 
+                                username=username)}}>
+                                {{ s[0] }}</a>
+                        <h3>
+                                <p>{{ s[1] }}, {{ s[2] }}</p>
+                    </div>
+                </li>
+            {% endfor %}
+        {% endif %}
 </div>
 
 <div id="footer">
