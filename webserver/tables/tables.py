@@ -44,11 +44,11 @@ stmt5 = """CREATE TABLE IF NOT EXISTS Posts (
 );"""
 
 stmt6 = """CREATE TABLE IF NOT EXISTS Posted_Pictures (
-    title TEXT,
     pid INT,
-    image_path TEXT NOT NULL,
-    PRIMARY KEY(title, pid),
-    FOREIGN KEY(pid) REFERENCES Posts ON DELETE CASCADE
+    image_path TEXT PRIMARY KEY,
+    sid INT,
+    FOREIGN KEY(pid) REFERENCES Posts ON DELETE CASCADE,
+    FOREIGN KEY(sid) REFERENCES Sessions ON DELETE CASCADE
 );"""
 
 stmt7 = """CREATE TABLE IF NOT EXISTS Comments (

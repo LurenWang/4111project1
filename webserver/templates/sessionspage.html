@@ -56,6 +56,11 @@
                 <li>
                     <div id=posts_list>
                         <h3>{{ p[0] }}</h3>
+                        {% for pic in pictures %}
+                            {% if pic[0] == p[2] %}
+                                <img src={{ pic[1] }} alt=" Default View" style="width:304px;height:228px;">
+                            {% endif %}
+                        {% endfor %}
                         <p>{{ p[1] }}</p>
                     </div>
                 </li>
@@ -64,11 +69,15 @@
         {% endif %}
     </ul>
     {% if insession == 'True' %}
-        <form action="" method="post" name="post">
+        <form action="" method="post" name="post" enctype="multipart/form-data">
             {{ postform.hidden_tag() }}
             <p>
             Post:<br>
             {{ postform.post(size=160) }}<br>
+            </p>
+            <p>
+            Upload Picture:<br>
+            {{ postform.photo }}<br>
             </p>
             <p><input type="submit" value="Post"></p>
         </form>

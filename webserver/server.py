@@ -22,6 +22,7 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.pool import NullPool
 from flask import Flask, request, render_template, g, redirect, Response, url_for, \
         flash
+from werkzeug import secure_filename
 import pdb
 from tables import *
 from forms import *
@@ -44,10 +45,10 @@ app = Flask(__name__, template_folder=tmpl_dir)
 #     DATABASEURI = "postgresql://ewu2493:foobar@w4111db.eastus.cloudapp.azure.com/ewu2493"
 #
 DATABASEURI = "sqlite:///test.db"
+ALLOWED_EXTENSIONS = set(['jpg','jpeg', 'png'])
 
 engine = create_engine(DATABASEURI)
 Session = None
-
 
 for stmt in del_lst:
     engine.execute(stmt)
@@ -163,11 +164,24 @@ def sessionpage(sid):
         q1 = "insert into posts values (NULL, :a, NULL, :b, :c);"
         s.execute(q1, {'a':username, 'b':rows[0][1], 'c':postform.post.data})
         s.commit()
+        if postform.photo.data and allowed_file(postform.photo.data.filename):
+            fq = "select max(pid) from posts;"
+            result = s.execute(fq)
+            pid = result.fetchone()[0]
+
+            photo = secure_filename(postform.photo.data.filename)
+            file_path = os.path.join(os.getcwd() + app.config['UPLOAD_FOLDER'], photo)
+            prefix, suffix = os.path.splitext(file_path)
+            file_path = prefix + str(pid) + suffix
+            postform.photo.data.save(file_path)
+            fq1 = "insert into posted_pictures values (:a, :b, :c);"
+            prefix1, suffix1 = os.path.splitext(photo)
+            rel_path = '/static/' + prefix1 + str(pid) + suffix1
+            s.execute(fq1, {'a':pid, 'b':rel_path, 'c':sid})
+            s.commit()
     q2 = "select username, posted_text, pid from posts order by timestamp;"
     result = s.execute(q2)
     posts = result.fetchall()
-    #need to also insert into attends when creating session
-    #also list attendees and their roles
     q3 = "select * from attends where sid = :s;"
     result = s.execute(q3, {'s':rows[0][1]})
     attends = result.fetchall()
@@ -175,8 +189,11 @@ def sessionpage(sid):
     for a in attends:
         if username == a[0]:
             insession = True
+    q4 = "select pid, image_path from posted_pictures p where p.sid = :s;"
+    result = s.execute(q4, {'s':sid})
+    pictures = result.fetchall()
     return render_template('sessionspage.html', insession=str(insession), session=rows[0], attends=attends,
-            posts=posts, username=username, postform=postform, sid=sid)
+            posts=posts, pictures=pictures, username=username, postform=postform, sid=sid)
 
 @app.route('/join/<sid>')
 def joinsession(sid):
@@ -222,8 +239,8 @@ def postspage(pid):
         q1 = "insert into comments values (:a, :b, NULL, :c);"
         s.execute(q1, {'a':pid, 'b':username, 'c':commentform.comment.data})
         s.commit()
-    q2 = "select username, posted_text from comments order by timestamp;"
-    result = s.execute(q2)
+    q2 = "select username, posted_text from comments c where c.pid = :p order by timestamp;"
+    result = s.execute(q2, {'p':pid})
     comments = result.fetchall()
     return render_template('postspage.html', comments=comments, username=username,
             insession=insession, commentform=commentform, sid=sid)
@@ -245,6 +262,10 @@ def create_session(username):
         s.commit()
         return redirect(url_for('home', username=username))
     return render_template('createsession.html', form=form)
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 if __name__ == "__main__":
   import click
@@ -271,6 +292,7 @@ if __name__ == "__main__":
     print "running on %s:%d" % (HOST, PORT)
     app.config['WTF_CSRF_ENABLED'] = True
     app.config['SECRET_KEY'] = '1234567890'
+    app.config['UPLOAD_FOLDER'] = '/static'
     app.run(host=HOST, port=PORT, debug=True, threaded=threaded)
 
 

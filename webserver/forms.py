@@ -1,4 +1,5 @@
-from flask.ext.wtf import Form
+from flask_wtf import Form
+from flask_wtf.file import FileField
 from wtforms import StringField, TextField, IntegerField, validators
 from wtforms.validators import DataRequired
 
@@ -23,6 +24,7 @@ class CreateSessionForm(Form):
 
 class PostForm(Form):
     post = TextField('Post', validators=[DataRequired()])
+    photo = FileField('Photo')
 
 class CommentForm(Form):
     comment = TextField('Comment', validators=[DataRequired()])
