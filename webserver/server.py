@@ -166,8 +166,45 @@ def sessionpage(sid):
     q2 = "select username, posted_text, pid from posts order by timestamp;"
     result = s.execute(q2)
     posts = result.fetchall()
-    return render_template('sessionspage.html', session=rows[0], posts=posts,
-                username=username, postform=postform, sid=sid)
+    #need to also insert into attends when creating session
+    #also list attendees and their roles
+    q3 = "select * from attends where sid = :s;"
+    result = s.execute(q3, {'s':rows[0][1]})
+    attends = result.fetchall()
+    insession = False
+    for a in attends:
+        if username == a[0]:
+            insession = True
+    return render_template('sessionspage.html', insession=str(insession), session=rows[0], attends=attends,
+            posts=posts, username=username, postform=postform, sid=sid)
+
+@app.route('/join/<sid>')
+def joinsession(sid):
+    username = request.args['username']
+    s = Session()
+    q = "select username from attends where username = :u and sid = :s;"
+    result = s.execute(q, {'u':username, 's':sid})
+    rows = result.fetchone()
+    if rows:
+        return redirect(url_for('sessionpage', sid=sid, username=username))
+    q1 = "insert into attends values (:u, :s, 'attendee');"
+    s.execute(q1, {'u':username, 's':sid})
+    s.commit()
+    return redirect(url_for('sessionpage', sid=sid, username=username))
+
+@app.route('/leave/<sid>')
+def leavesession(sid):
+    username = request.args['username']
+    s = Session()
+    q = "select username from attends where username = :u and sid = :s;"
+    result = s.execute(q, {'u':username, 's':sid})
+    rows = result.fetchone()
+    if not rows:
+        return redirect(url_for('sessionpage', sid=sid, username=username))
+    q1 = "delete from attends where username = :u and sid = :s;"
+    s.execute(q1, {'u':username, 's':sid})
+    s.commit()
+    return redirect(url_for('sessionpage', sid=sid, username=username))
 
 @app.route('/post/<pid>', methods=['GET', 'POST'])
 def postspage(pid):
@@ -177,6 +214,7 @@ def postspage(pid):
     result = s.execute(q, {'p':pid})
     rows = result.fetchall()
     username = request.args['username']
+    insession = request.args['insession']
     sid = request.args['sid']
     if len(rows) == 0:
         return redirect(url_for('sessionpage', sid=sid))
@@ -188,7 +226,7 @@ def postspage(pid):
     result = s.execute(q2)
     comments = result.fetchall()
     return render_template('postspage.html', comments=comments, username=username,
-            commentform=commentform, sid=sid)
+            insession=insession, commentform=commentform, sid=sid)
 
 @app.route('/createsession/<username>', methods=['GET', 'POST'])
 def create_session(username):
@@ -198,6 +236,12 @@ def create_session(username):
         q = "insert into sessions values (:u, NULL, :a, :b, :c, :d, :e);"
         s.execute(q, {'u':username, 'a':form.title.data, 'b':form.start_time.data, 
             'c':form.length.data, 'd':form.location.data, 'e':form.description.data})
+        s.commit()
+        q0 = "select max(sid) from sessions;"
+        result = s.execute(q0)
+        sid = result.fetchone()[0]
+        q1 = "insert into attends values (:u, :s, 'admin');"
+        s.execute(q1, {'u':username, 's':sid})
         s.commit()
         return redirect(url_for('home', username=username))
     return render_template('createsession.html', form=form)

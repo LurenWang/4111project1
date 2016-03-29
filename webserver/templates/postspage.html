@@ -61,14 +61,16 @@
                 </li>
             {% endfor %}
         {% endif %}
-        <form action="" method="post" name="comment">
-            {{ commentform.hidden_tag() }}
-            <p>
-            Comment:<br>
-            {{ commentform.comment(size=160) }}<br>
-            </p>
-            <p><input type="submit" value="Comment"></p>
-        </form>
+        {% if insession == 'True' %}
+            <form action="" method="post" name="comment">
+                {{ commentform.hidden_tag() }}
+                <p>
+                Comment:<br>
+                {{ commentform.comment(size=160) }}<br>
+                </p>
+                <p><input type="submit" value="Comment"></p>
+            </form>
+        {% endif %}
 </div>
 
 <div id="footer">

@@ -11,7 +11,7 @@
 #nav {
     line-height:30px;
     background-color:#eeeeee;
-    height:300px;
+    height:auto;
     width:200px;
     float:left;
     padding:5px;	      
@@ -24,7 +24,7 @@
 #description_section {
     line-height:30px;
     background-color:#eeeeee;
-    height:300px;
+    height:auto;
     width:200px;
     float:right;
     padding:5px;	      
@@ -59,9 +59,11 @@
                         <p>{{ p[1] }}</p>
                     </div>
                 </li>
-                <a href={{ url_for('postspage', pid=p[2], username=username, sid=sid )}}>Comment</a>
+                <a href={{ url_for('postspage', pid=p[2], username=username, insession=insession, sid=sid )}}>Comments</a>
             {% endfor %}
         {% endif %}
+    </ul>
+    {% if insession == 'True' %}
         <form action="" method="post" name="post">
             {{ postform.hidden_tag() }}
             <p>
@@ -70,6 +72,29 @@
             </p>
             <p><input type="submit" value="Post"></p>
         </form>
+    {% endif %}
+</div>
+
+<div id="description_section">
+    {% if insession == 'True' %}
+        <a href={{ url_for('leavesession', username=username, sid=sid) }}>Leave Session</a>
+    {% else %}
+        <a href={{ url_for('joinsession', username=username, sid=sid) }}>Join Session</a>
+    {% endif %}
+    <ul class=descriptions>
+        <li>Time: {{ session[3] }}</li>
+        <li>Length: {{ session[4] }}</li>
+        <li>Location: {{ session[5] }}</li>
+        {% if session[6] %}
+            <li><p>{{ session[6] }}</p></li>
+        {% endif %}
+    </ul>
+    <h4>Attendents</h4>
+    <ul class=attendees>
+        {% for a in attends %}
+            <li>{{ a[0] }} -- {{ a[2] }}</li>
+        {% endfor %}
+    </ul>
 </div>
 
 <div id="footer">
