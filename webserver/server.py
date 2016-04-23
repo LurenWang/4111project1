@@ -179,8 +179,8 @@ def sessionpage(sid):
             rel_path = '/static/' + prefix1 + str(pid) + suffix1
             s.execute(fq1, {'a':pid, 'b':rel_path, 'c':sid})
             s.commit()
-    q2 = "select username, posted_text, pid from posts order by timestamp;"
-    result = s.execute(q2)
+    q2 = "select username, posted_text, pid from posts p where p.sid = :s order by timestamp;"
+    result = s.execute(q2, {'s': sid})
     posts = result.fetchall()
     q3 = "select * from attends where sid = :s;"
     result = s.execute(q3, {'s':rows[0][1]})
