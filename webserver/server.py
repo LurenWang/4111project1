@@ -16,6 +16,7 @@ Read about it online.
 """
 
 import os
+import sqlalchemy as sa
 from sqlalchemy import *
 from sqlalchemy.sql import text
 from sqlalchemy.orm import sessionmaker, scoped_session
@@ -23,6 +24,7 @@ from sqlalchemy.pool import NullPool
 from flask import Flask, request, render_template, g, redirect, Response, url_for, \
         flash
 from werkzeug import secure_filename
+import json
 import pdb
 from tables import *
 from forms import *
@@ -44,7 +46,8 @@ app = Flask(__name__, template_folder=tmpl_dir)
 #
 #     DATABASEURI = "postgresql://ewu2493:foobar@w4111db.eastus.cloudapp.azure.com/ewu2493"
 #
-DATABASEURI = "sqlite:///test.db"
+#DATABASEURI = "sqlite:///test.db"
+DATABASEURI = "postgres://luren:Wl205487@localhost/groupit"
 ALLOWED_EXTENSIONS = set(['jpg','jpeg', 'png'])
 
 engine = create_engine(DATABASEURI)
@@ -142,13 +145,25 @@ def login():
             return render_template('login.html', form=form)
     return render_template('login.html', form=form)
 
-@app.route('/home/<username>')
+@app.route('/search/<username>')
+def search(username):
+    search = request.args.get('search')
+    s = Session()
+    q = "SELECT title, start_time, location, sid FROM SESSIONS WHERE META->> 'tags' like :s;"
+    result = s.execute(q, {'s':'%' + search + '%'})
+    rows = result.fetchall()
+    return render_template('searchpage.html', username=username, sessions=rows)
+
+@app.route('/home/<username>', methods=['GET', 'POST'])
 def home(username):
+    searchform = SearchForm()
     q = "select title, start_time, location, sid from sessions;"
     s = Session()
     result = s.execute(q)
     rows = result.fetchall()
-    return render_template('homepage.html', username=username, sessions=rows)
+    if searchform.validate_on_submit():
+        return redirect(url_for("search", username=username, search=searchform.search_item.data))
+    return render_template('homepage.html', username=username, sessions=rows, form=searchform)
 
 @app.route('/session/<sid>', methods=['GET', 'POST'])
 def sessionpage(sid):
@@ -161,7 +176,7 @@ def sessionpage(sid):
     if len(rows) == 0:
         return redirect(url_for('home', username=username))
     if postform.validate_on_submit():
-        q1 = "insert into posts values (NULL, :a, NULL, :b, :c);"
+        q1 = "insert into posts(username, sid, posted_text) values (:a, :b, :c);"
         s.execute(q1, {'a':username, 'b':rows[0][1], 'c':postform.post.data})
         s.commit()
         if postform.photo.data and allowed_file(postform.photo.data.filename):
@@ -192,8 +207,9 @@ def sessionpage(sid):
     q4 = "select pid, image_path from posted_pictures p where p.sid = :s;"
     result = s.execute(q4, {'s':sid})
     pictures = result.fetchall()
+    tags = rows[0][6]['tags']
     return render_template('sessionspage.html', insession=str(insession), session=rows[0], attends=attends,
-            posts=posts, pictures=pictures, username=username, postform=postform, sid=sid)
+            posts=posts, pictures=pictures, username=username, postform=postform, tags=tags, sid=sid)
 
 @app.route('/join/<sid>')
 def joinsession(sid):
@@ -236,7 +252,7 @@ def postspage(pid):
     if len(rows) == 0:
         return redirect(url_for('sessionpage', sid=sid))
     if commentform.validate_on_submit():
-        q1 = "insert into comments values (:a, :b, NULL, :c);"
+        q1 = "insert into comments(pid, username, posted_text) values (:a, :b, :c);"
         s.execute(q1, {'a':pid, 'b':username, 'c':commentform.comment.data})
         s.commit()
     q2 = "select username, posted_text from comments c where c.pid = :p order by timestamp;"
@@ -250,9 +266,12 @@ def create_session(username):
     form = CreateSessionForm()
     if form.validate_on_submit():
         s = Session()
-        q = "insert into sessions values (:u, NULL, :a, :b, :c, :d, :e);"
+        tags = [x.strip() for x in form.tags.data.split(',')]
+        meta = {'tags': tags}
+        q = "insert into sessions(username, title, start_time, session_length, location, meta, description) values \
+                (:u, :a, :b, :c, :d, :m, :e);"
         s.execute(q, {'u':username, 'a':form.title.data, 'b':form.start_time.data, 
-            'c':form.length.data, 'd':form.location.data, 'e':form.description.data})
+            'c':form.length.data, 'd':form.location.data, 'm':json.dumps(meta), 'e':form.description.data})
         s.commit()
         q0 = "select max(sid) from sessions;"
         result = s.execute(q0)

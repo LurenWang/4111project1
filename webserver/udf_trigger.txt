@@ -1,0 +1,21 @@
+function:
+CREATE OR REPLACE FUNCTION tag_func() RETURNS TRIGGER AS $tag_update$
+    BEGIN
+        -- Loop through tags in inserted row
+        FOR t IN json_array_elements(NEW.meta->'tags')
+        LOOP
+            -- Check if new tag exists
+            IF EXISTS (SELECT tag FROM MetaTags WHERE tag = t) THEN
+                -- Update count
+                UPDATE MetaTags SET count = count + 1 WHERE tag = t;
+                RETURN NULL;
+            END IF;
+        END LOOP;
+        RETURN NEW;
+    END;
+$tag_update$ LANGUAGE plpgsql;
+
+trigger:
+CREATE TRIGGER tag_trig BEFORE INSERT ON Sessions
+FOR EACH ROW EXECUTE PROCEDURE tag_audit_func();
+

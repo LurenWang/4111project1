@@ -3,6 +3,9 @@ from flask_wtf.file import FileField
 from wtforms import StringField, TextField, IntegerField, validators
 from wtforms.validators import DataRequired
 
+class SearchForm(Form):
+    search_item = StringField('Search', validators=[DataRequired()])
+
 class CreateAccountForm(Form):
     username = StringField('Username', validators=[DataRequired()])
     name = StringField('Name', validators=[DataRequired()])
@@ -20,6 +23,7 @@ class CreateSessionForm(Form):
     length = IntegerField('Length', validators=[DataRequired(), 
         validators.NumberRange(min=0, max=999)])
     location = StringField('Location', validators=[DataRequired()])
+    tags = StringField('Tags', validators=[DataRequired()])
     description = StringField('Description')
 
 class PostForm(Form):

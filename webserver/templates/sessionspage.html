@@ -94,8 +94,15 @@
         <li>Time: {{ session[3] }}</li>
         <li>Length: {{ session[4] }}</li>
         <li>Location: {{ session[5] }}</li>
-        {% if session[6] %}
-            <li><p>{{ session[6] }}</p></li>
+        <li>Tags:
+            <ul>
+                {% for tag in tags %}
+                <li>{{tag}}</li>
+                {% endfor %}
+            </ul>
+        </li>
+        {% if session[7] %}
+            <li><p>{{ session[7] }}</p></li>
         {% endif %}
     </ul>
     <h4>Attendents</h4>

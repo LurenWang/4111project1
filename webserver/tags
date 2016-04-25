@@ -4,17 +4,43 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
-DATABASEURI	server.py	/^DATABASEURI = "sqlite:\/\/\/test.db"$/;"	v
-add	server.py	/^def add():$/;"	f
-another	server.py	/^def another():$/;"	f
+ALLOWED_EXTENSIONS	server.py	/^ALLOWED_EXTENSIONS = set(['jpg','jpeg', 'png'])$/;"	v
+CommentForm	forms.py	/^class CommentForm(Form):$/;"	c
+CreateAccountForm	forms.py	/^class CreateAccountForm(Form):$/;"	c
+CreateSessionForm	forms.py	/^class CreateSessionForm(Form):$/;"	c
+LoginForm	forms.py	/^class LoginForm(Form):$/;"	c
+PostForm	forms.py	/^class PostForm(Form):$/;"	c
+Session	server.py	/^Session = None$/;"	v
+allowed_file	server.py	/^def allowed_file(filename):$/;"	f
 app	server.py	/^app = Flask(__name__, template_folder=tmpl_dir)$/;"	v
 before_request	server.py	/^def before_request():$/;"	f
+comment	forms.py	/^    comment = TextField('Comment', validators=[DataRequired()])$/;"	v	class:CommentForm
+contact_info	forms.py	/^    contact_info = StringField('Contact')$/;"	v	class:CreateAccountForm
+create_account	server.py	/^def create_account():$/;"	f
 create_lst	tables/tables.py	/^create_lst = []$/;"	v
+create_session	server.py	/^def create_session(username):$/;"	f
 del_lst	tables/tables.py	/^del_lst = []$/;"	v
+description	forms.py	/^    description = StringField('Description')$/;"	v	class:CreateSessionForm
+description	forms.py	/^    description = StringField('description')$/;"	v	class:CreateAccountForm
 engine	server.py	/^engine = create_engine(DATABASEURI)$/;"	v
+home	server.py	/^def home(username):$/;"	f
 index	server.py	/^def index():$/;"	f
+joinsession	server.py	/^def joinsession(sid):$/;"	f
+leavesession	server.py	/^def leavesession(sid):$/;"	f
+length	forms.py	/^    length = IntegerField('Length', validators=[DataRequired(), $/;"	v	class:CreateSessionForm
+location	forms.py	/^    location = StringField('Location', validators=[DataRequired()])$/;"	v	class:CreateSessionForm
 login	server.py	/^def login():$/;"	f
-login_manager	server.py	/^login_manager = LoginManager()$/;"	v
-run	server.py	/^  def run(debug, threaded, host, port):$/;"	f	function:login
+name	forms.py	/^    name = StringField('Name', validators=[DataRequired()])$/;"	v	class:CreateAccountForm
+password	forms.py	/^    password = StringField('Password', validators=[DataRequired()])$/;"	v	class:CreateAccountForm
+password	forms.py	/^    password = StringField('Password', validators=[DataRequired()])$/;"	v	class:LoginForm
+photo	forms.py	/^    photo = FileField('Photo')$/;"	v	class:PostForm
+post	forms.py	/^    post = TextField('Post', validators=[DataRequired()])$/;"	v	class:PostForm
+postspage	server.py	/^def postspage(pid):$/;"	f
+run	server.py	/^  def run(debug, threaded, host, port):$/;"	f	function:allowed_file
+sessionpage	server.py	/^def sessionpage(sid):$/;"	f
+start_time	forms.py	/^    start_time = StringField('Time', validators=[DataRequired()])$/;"	v	class:CreateSessionForm
 teardown_request	server.py	/^def teardown_request(exception):$/;"	f
+title	forms.py	/^    title = StringField('Title', validators=[DataRequired()])$/;"	v	class:CreateSessionForm
 tmpl_dir	server.py	/^tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')$/;"	v
+username	forms.py	/^    username = StringField('Username', validators=[DataRequired()])$/;"	v	class:CreateAccountForm
+username	forms.py	/^    username = StringField('Username', validators=[DataRequired()])$/;"	v	class:LoginForm

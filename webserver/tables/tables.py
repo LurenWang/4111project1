@@ -1,24 +1,25 @@
 stmt1 = """CREATE TABLE IF NOT EXISTS Users (
-    username STRING PRIMARY KEY,
-    name STRING,
-    password STRING,
-    contact_info STRING,
+    username TEXT PRIMARY KEY,
+    name TEXT,
+    password TEXT,
+    contact_info TEXT,
     description TEXT
 );"""
 
 stmt2 = """CREATE TABLE IF NOT EXISTS Sessions (
-    username STRING,
-    sid INTEGER PRIMARY KEY,
-    title STRING NOT NULL,
-    start_time STRING NOT NULL,
+    username TEXT,
+    sid SERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    start_time TEXT NOT NULL,
     session_length INT NOT NULL,
     location TEXT NOT NULL,
+    meta JSON NOT NULL,
     description TEXT,
     FOREIGN KEY(username) REFERENCES Users
 );"""
 
 stmt3 = """CREATE TABLE IF NOT EXISTS Attends (
-    username STRING,
+    username TEXT,
     sid INT,
     role TEXT CHECK (role IN ('attendee', 'admin')),
     PRIMARY KEY(username, sid),
@@ -26,17 +27,17 @@ stmt3 = """CREATE TABLE IF NOT EXISTS Attends (
     FOREIGN KEY(sid) REFERENCES Sessions on DELETE CASCADE
 );"""
 
-stmt4 = """CREATE TABLE IF NOT EXISTS Tags (
-    sid INT,
-    tag TEXT NOT NULL,
-    PRIMARY KEY(sid, tag),
-    FOREIGN KEY(sid) REFERENCES Sessions ON DELETE CASCADE
+#Most popular tags
+stmt4 = """CREATE TABLE IF NOT EXISTS MetaTags (
+    tag TEXT UNIQUE NOT NULL,
+    count INT DEFAULT 1,
+    PRIMARY KEY(tag)
 );"""
 
 stmt5 = """CREATE TABLE IF NOT EXISTS Posts (
-    pid INTEGER PRIMARY KEY,
-    username STRING,
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    pid SERIAL PRIMARY KEY,
+    username TEXT,
+    timestamp TIMESTAMP DEFAULT NOW(),
     sid INT,
     posted_text TEXT NOT NULL,
     FOREIGN KEY(username) REFERENCES Users ON DELETE CASCADE,
@@ -53,20 +54,22 @@ stmt6 = """CREATE TABLE IF NOT EXISTS Posted_Pictures (
 
 stmt7 = """CREATE TABLE IF NOT EXISTS Comments (
     pid INT,
-    username STRING,
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    username TEXT,
+    timestamp TIMESTAMP DEFAULT NOW(),
     posted_text TEXT NOT NULL,
     PRIMARY KEY(pid, username, timestamp),
     FOREIGN KEY(pid) REFERENCES Posts ON DELETE CASCADE
 );"""
 
-stmt8 = """DROP TABLE IF EXISTS Users;"""
-stmt9 = """DROP TABLE IF EXISTS Sessions;"""
-stmt10 = """DROP TABLE IF EXISTS Attends;"""
-stmt11 = """DROP TABLE IF EXISTS Tags;"""
-stmt12 = """DROP TABLE IF EXISTS Posts;"""
-stmt13 = """DROP TABLE IF EXISTS Posted_Pictures;"""
-stmt14 = """DROP TABLE IF EXISTS Comments;"""
+#stmt8 = """DROP TABLE IF EXISTS Users CASCADE;"""
+#stmt9 = """DROP TABLE IF EXISTS Sessions CASCADE;"""
+#stmt10 = """DROP TABLE IF EXISTS Attends CASCADE;"""
+#stmt11 = """DROP TABLE IF EXISTS Tags CASCADE;"""
+#stmt12 = """DROP TABLE IF EXISTS Posts CASCADE;"""
+#stmt13 = """DROP TABLE IF EXISTS Posted_Pictures CASCADE;"""
+#stmt14 = """DROP TABLE IF EXISTS Comments CASCADE;"""
+stmt8 = """drop schema public cascade;"""
+stmt9 = """create schema public;"""
 
 create_lst = []
 create_lst.append(stmt1)
@@ -80,8 +83,3 @@ create_lst.append(stmt7)
 del_lst = []
 del_lst.append(stmt8)
 del_lst.append(stmt9)
-del_lst.append(stmt10)
-del_lst.append(stmt11)
-del_lst.append(stmt12)
-del_lst.append(stmt13)
-del_lst.append(stmt14)
